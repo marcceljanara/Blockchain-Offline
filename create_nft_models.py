@@ -120,16 +120,24 @@ def run():
     # Get the sender's address
     sender_address = account.addresses()[0].address
 
+    processed_files = set()
+
     while True:
         try:
             # Get the list of files in the folder
             files = list(Path(folder_path).iterdir())
+            new_files = [file for file in files if file.name not in processed_files]
 
-            for file in files:
-                file_path = str(file)
-                process_file(file_path, file.name, account, sender_address, passphrase)
+            if new_files:
+                for file in new_files:
+                    file_path = str(file)
+                    process_file(file_path, file.name, account, sender_address, passphrase)
+                    processed_files.add(file.name)
 
-            print("All files processed!")
+                print("All new files processed!")
+            else:
+                print("No new files. Waiting for new files...")
+
         except Exception as e:
             print(f"Error during file processing: {e}")
 
